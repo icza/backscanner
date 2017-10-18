@@ -8,7 +8,17 @@ import (
 	"github.com/icza/mighty"
 )
 
-func Test1(t *testing.T) {
+func TestDefaults(t *testing.T) {
+	eq := mighty.Eq(t)
+
+	scanner := New(nil, 0)
+	eq(DefaultChunkSize, scanner.o.ChunkSize)
+
+	scanner = NewOptions(nil, 0, &Options{ChunkSize: -1})
+	eq(DefaultChunkSize, scanner.o.ChunkSize)
+}
+
+func TestScanner(t *testing.T) {
 	eq := mighty.Eq(t)
 
 	type result struct {
@@ -48,19 +58,22 @@ func Test1(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		scanner := New(strings.NewReader(c.input), len(c.input))
-		i := 0
-		for {
-			line, pos, err := scanner.Line()
-			exp := c.exps[i]
-			eq(exp.line, line)
-			eq(exp.pos, pos)
-			eq(exp.err, err)
-			if err == io.EOF {
-				eq(len(c.exps)-1, i)
-				break
+		// Test with different chunk sizes:
+		for _, chunkSize := range []int{-1, 0, 1, 2, 10, 100} {
+			scanner := NewOptions(strings.NewReader(c.input), len(c.input), &Options{ChunkSize: chunkSize})
+			i := 0
+			for {
+				line, pos, err := scanner.Line()
+				exp := c.exps[i]
+				eq(exp.line, line)
+				eq(exp.pos, pos)
+				eq(exp.err, err)
+				if err == io.EOF {
+					eq(len(c.exps)-1, i)
+					break
+				}
+				i++
 			}
-			i++
 		}
 	}
 }

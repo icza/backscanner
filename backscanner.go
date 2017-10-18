@@ -27,7 +27,7 @@ Output:
 
 Using it to scan a file backward, starting from its end:
 
-	f, err := os.Open("a.txt")
+	f, err := os.Open("mylog.txt")
 	if err != nil {
 		panic(err)
 	}
@@ -48,17 +48,45 @@ import (
 	"io"
 )
 
+const (
+	// DefaultChunkSize is the default value for ChunkSize
+	DefaultChunkSize = 1024
+)
+
 // Scanner is the back-scanner implementation.
 type Scanner struct {
 	r   io.ReaderAt
 	pos int
-	err error
-	buf []byte
+	o   Options
+
+	err  error
+	buf  []byte
+	buf2 []byte // buf2 stores the last buffer to be reused
+}
+
+// Options contains parameters that influence the internal working of the Scanner.
+type Options struct {
+	// ChunkSize specifies the size of the chunk that is read at once from the input.
+	ChunkSize int
 }
 
 // New returns a new Scanner.
 func New(r io.ReaderAt, pos int) *Scanner {
-	return &Scanner{r: r, pos: pos}
+	return NewOptions(r, pos, nil)
+}
+
+// NewOptions returns a new Scanner with the given Options.
+// Invalid option values are replaced with their default values.
+func NewOptions(r io.ReaderAt, pos int, o *Options) *Scanner {
+	s := &Scanner{r: r, pos: pos}
+
+	if o != nil && o.ChunkSize > 0 {
+		s.o.ChunkSize = o.ChunkSize
+	} else {
+		s.o.ChunkSize = DefaultChunkSize
+	}
+
+	return s
 }
 
 // readMore reads more data from the input.
@@ -67,17 +95,21 @@ func (s *Scanner) readMore() {
 		s.err = io.EOF
 		return
 	}
-	size := 1024
+	size := s.o.ChunkSize
 	if size > s.pos {
 		size = s.pos
 	}
 	s.pos -= size
-	buf2 := make([]byte, size, size+len(s.buf))
+	if cap(s.buf2) >= size+len(s.buf) {
+		s.buf2 = s.buf2[:size]
+	} else {
+		s.buf2 = make([]byte, size, size+len(s.buf))
+	}
 
 	// ReadAt attempts to read full buff!
-	_, s.err = s.r.ReadAt(buf2, int64(s.pos))
+	_, s.err = s.r.ReadAt(s.buf2, int64(s.pos))
 	if s.err == nil {
-		s.buf = append(buf2, s.buf...)
+		s.buf, s.buf2 = append(s.buf2, s.buf...), s.buf
 	}
 }
 

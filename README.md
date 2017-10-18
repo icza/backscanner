@@ -33,7 +33,7 @@ Output:
 
 Using it to scan a file backward, starting from its end:
 
-	f, err := os.Open("a.txt")
+	f, err := os.Open("mylog.txt")
 	if err != nil {
 		panic(err)
 	}
