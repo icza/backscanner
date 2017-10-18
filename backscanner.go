@@ -43,18 +43,20 @@ func (s *Scanner) readMore() {
 	}
 }
 
-// Line returns the next line from the input.
-// Also returns the absolute start byte-position of the line in the input.
-func (s *Scanner) Line() (line string, start int, err error) {
+// LineBytes returns the bytes of the next line from the input and its absolute byte-position.
+// Line ending is cut from the line. Empty lines are also returned.
+// After returning the last line (which is the first in the input),
+// subsequent calls report io.EOF.
+func (s *Scanner) LineBytes() (line []byte, pos int, err error) {
 	if s.err != nil {
-		return "", 0, s.err
+		return nil, 0, s.err
 	}
+
 	for {
 		lineStart := bytes.LastIndexByte(s.buf, '\n')
 		if lineStart >= 0 {
 			// We have a complete line:
-			var line string
-			line, s.buf = string(dropCR(s.buf[lineStart+1:])), s.buf[:lineStart]
+			line, s.buf = dropCR(s.buf[lineStart+1:]), s.buf[:lineStart]
 			return line, s.pos + lineStart, nil
 		}
 		// Need more data:
@@ -62,12 +64,23 @@ func (s *Scanner) Line() (line string, start int, err error) {
 		if s.err != nil {
 			if s.err == io.EOF {
 				if len(s.buf) > 0 {
-					return string(dropCR(s.buf)), 0, nil
+					return dropCR(s.buf), 0, nil
 				}
 			}
-			return "", 0, s.err
+			return nil, 0, s.err
 		}
 	}
+}
+
+// Line returns the next line from the input and its absolute byte-position.
+// Line ending is cut from the line. Empty lines are also returned.
+// After returning the last line (which is the first in the input),
+// subsequent calls report io.EOF.
+func (s *Scanner) Line() (line string, pos int, err error) {
+	var lineBytes []byte
+	lineBytes, pos, err = s.LineBytes()
+	line = string(lineBytes)
+	return
 }
 
 // dropCR drops a terminal \r from the data.
