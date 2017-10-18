@@ -13,9 +13,14 @@ func TestDefaults(t *testing.T) {
 
 	scanner := New(nil, 0)
 	eq(DefaultChunkSize, scanner.o.ChunkSize)
+	eq(DefaultMaxBufferSize, scanner.o.MaxBufferSize)
 
-	scanner = NewOptions(nil, 0, &Options{ChunkSize: -1})
+	scanner = NewOptions(nil, 0, &Options{
+		ChunkSize:     -1,
+		MaxBufferSize: -1,
+	})
 	eq(DefaultChunkSize, scanner.o.ChunkSize)
+	eq(DefaultMaxBufferSize, scanner.o.MaxBufferSize)
 }
 
 func TestScanner(t *testing.T) {
@@ -76,4 +81,15 @@ func TestScanner(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestLongLine(t *testing.T) {
+	eq := mighty.Eq(t)
+
+	scanner := NewOptions(strings.NewReader("123456789"), 10, &Options{
+		MaxBufferSize: 5,
+	})
+
+	_, _, err := scanner.Line()
+	eq(ErrLongLine, err)
 }

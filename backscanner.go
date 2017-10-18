@@ -45,12 +45,22 @@ package backscanner
 
 import (
 	"bytes"
+	"errors"
 	"io"
 )
 
 const (
-	// DefaultChunkSize is the default value for ChunkSize
+	// DefaultChunkSize is the default value for the ChunkSize option
 	DefaultChunkSize = 1024
+
+	// DefaultMaxBufferSize is the default value for the MaxBufferSize option
+	DefaultMaxBufferSize = 1 << 20 // 1 MB
+)
+
+var (
+	// ErrLongLine indicates that the line is longer than the internal buffer
+	// size
+	ErrLongLine = errors.New("line too long")
 )
 
 // Scanner is the back-scanner implementation.
@@ -67,7 +77,12 @@ type Scanner struct {
 // Options contains parameters that influence the internal working of the Scanner.
 type Options struct {
 	// ChunkSize specifies the size of the chunk that is read at once from the input.
+	// Valid values are > 0.
 	ChunkSize int
+
+	// MaxBufferSize limits the maximum size of the buffer used internally.
+	// This also limits the max line size.
+	MaxBufferSize int
 }
 
 // New returns a new Scanner.
@@ -85,6 +100,11 @@ func NewOptions(r io.ReaderAt, pos int, o *Options) *Scanner {
 	} else {
 		s.o.ChunkSize = DefaultChunkSize
 	}
+	if o != nil && o.MaxBufferSize > 0 {
+		s.o.MaxBufferSize = o.MaxBufferSize
+	} else {
+		s.o.MaxBufferSize = DefaultMaxBufferSize
+	}
 
 	return s
 }
@@ -100,10 +120,16 @@ func (s *Scanner) readMore() {
 		size = s.pos
 	}
 	s.pos -= size
-	if cap(s.buf2) >= size+len(s.buf) {
+
+	bufSize := size + len(s.buf)
+	if bufSize > s.o.MaxBufferSize {
+		s.err = ErrLongLine
+		return
+	}
+	if cap(s.buf2) >= bufSize {
 		s.buf2 = s.buf2[:size]
 	} else {
-		s.buf2 = make([]byte, size, size+len(s.buf))
+		s.buf2 = make([]byte, size, bufSize)
 	}
 
 	// ReadAt attempts to read full buff!
