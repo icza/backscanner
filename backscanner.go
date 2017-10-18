@@ -58,8 +58,7 @@ const (
 )
 
 var (
-	// ErrLongLine indicates that the line is longer than the internal buffer
-	// size
+	// ErrLongLine indicates that the line is longer than the internal buffer size
 	ErrLongLine = errors.New("line too long")
 )
 
@@ -77,7 +76,6 @@ type Scanner struct {
 // Options contains parameters that influence the internal working of the Scanner.
 type Options struct {
 	// ChunkSize specifies the size of the chunk that is read at once from the input.
-	// Valid values are > 0.
 	ChunkSize int
 
 	// MaxBufferSize limits the maximum size of the buffer used internally.
@@ -139,7 +137,8 @@ func (s *Scanner) readMore() {
 	}
 }
 
-// LineBytes returns the bytes of the next line from the input and its absolute byte-position.
+// LineBytes returns the bytes of the next line from the input and its absolute
+// byte-position.
 // Line ending is cut from the line. Empty lines are also returned.
 // After returning the last line (which is the first in the input),
 // subsequent calls report io.EOF.
