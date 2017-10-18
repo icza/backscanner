@@ -2,6 +2,28 @@
 Package backscanner provides a scanner similar to bufio.Scanner that reads
 and returns lines in reverse order, starting at a given position (which may be
 the end of the input).
+
+Unlike with bufio.Scanner, max line length is not limited.
+
+Example using it:
+
+	input := "Line1\nLine2\nLine3"
+	scanner := backscanner.New(strings.NewReader(input), len(input))
+	for {
+		line, pos, err := scanner.Line()
+		if err != nil {
+			fmt.Println("Error:", err)
+			break
+		}
+		fmt.Printf("Line position: %2d, line: %q\n", pos, line)
+	}
+
+Output:
+
+	Line position: 12, line: "Line3"
+	Line position:  6, line: "Line2"
+	Line position:  0, line: "Line1"
+	Error: EOF
 */
 package backscanner
 
@@ -57,7 +79,7 @@ func (s *Scanner) LineBytes() (line []byte, pos int, err error) {
 		if lineStart >= 0 {
 			// We have a complete line:
 			line, s.buf = dropCR(s.buf[lineStart+1:]), s.buf[:lineStart]
-			return line, s.pos + lineStart, nil
+			return line, s.pos + lineStart + 1, nil
 		}
 		// Need more data:
 		s.readMore()

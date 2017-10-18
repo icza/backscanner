@@ -27,10 +27,10 @@ func Test1(t *testing.T) {
 		{
 			input: "Start\nLine1\nLine2\nLine3\nEnd",
 			exps: []result{
-				{"End", 23, nil},
-				{"Line3", 17, nil},
-				{"Line2", 11, nil},
-				{"Line1", 5, nil},
+				{"End", 24, nil},
+				{"Line3", 18, nil},
+				{"Line2", 12, nil},
+				{"Line1", 6, nil},
 				{"Start", 0, nil},
 				{"", 0, io.EOF},
 			},
@@ -39,8 +39,8 @@ func Test1(t *testing.T) {
 		{
 			input: "Line1\r\nLine2\r\n",
 			exps: []result{
-				{"", 13, nil},
-				{"Line2", 6, nil},
+				{"", 14, nil},
+				{"Line2", 7, nil},
 				{"Line1", 0, nil},
 				{"", 0, io.EOF},
 			},
