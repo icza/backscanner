@@ -1,9 +1,9 @@
 /*
 Package backscanner provides a scanner similar to bufio.Scanner that reads
 and returns lines in reverse order, starting at a given position (which may be
-the end of the input).
+the end of the input) and going backward.
 
-Unlike with bufio.Scanner, max line length is not limited.
+Unlike with bufio.Scanner, max line length may be configured.
 
 Example using it:
 
@@ -65,12 +65,12 @@ var (
 
 // Scanner is the back-scanner implementation.
 type Scanner struct {
-	r   io.ReaderAt
-	pos int
-	o   Options
+	r   io.ReaderAt // r is the input to read from
+	pos int         // pos is the position of the last read chunk
+	o   Options     // o is the Options in effect (options to work with)
 
-	err  error
-	buf  []byte
+	err  error  // err is the encountered error (if any)
+	buf  []byte // buf stores the read but not yet returned data
 	buf2 []byte // buf2 stores the last buffer to be reused
 }
 
