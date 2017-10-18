@@ -30,3 +30,18 @@ Output:
 	Line position:  6, line: "Line2"
 	Line position:  0, line: "Line1"
 	Error: EOF
+
+Using it to scan a file backward, starting from its end:
+
+	f, err := os.Open("a.txt")
+	if err != nil {
+		panic(err)
+	}
+	fi, err := f.Stat()
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	scanner := backscanner.New(f, int(fi.Size()))
+	// Now use scanner like in the previous example
