@@ -1,5 +1,5 @@
 /*
-Package backscanner provides a scanner similar to bufio.Scanner that reads
+Package backscanner provides a scanner similar to bufio.Scanner, but it reads
 and returns lines in reverse order, starting at a given position (which may be
 the end of the input) and going backward.
 
@@ -142,6 +142,11 @@ func (s *Scanner) readMore() {
 // Line ending is cut from the line. Empty lines are also returned.
 // After returning the last line (which is the first in the input),
 // subsequent calls report io.EOF.
+//
+// This method is for efficiency if you need to inspect or search in the line.
+// The returned line slice shares data with the internal buffer of the Scanner,
+// and its content may be overwritten in subsequent calls to LineBytes() or Line().
+// If you need to retain the line data, make a copy of it or use the Line() method.
 func (s *Scanner) LineBytes() (line []byte, pos int, err error) {
 	if s.err != nil {
 		return nil, 0, s.err

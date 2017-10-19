@@ -8,7 +8,7 @@
 Ever needed or wondered how to efficiently search for something in a log file,
 but starting at the end and going backward? Here's your solution.
 
-Package `backscanner` provides a scanner similar to `bufio.Scanner` that reads
+Package `backscanner` provides a scanner similar to `bufio.Scanner`, but it reads
 and returns lines in reverse order, starting at a given position (which may be
 the end of the input) and going backward.
 
