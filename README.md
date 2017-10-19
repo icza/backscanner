@@ -12,16 +12,16 @@ Package `backscanner` provides a scanner similar to `bufio.Scanner`, but it read
 and returns lines in reverse order, starting at a given position (which may be
 the end of the input) and going backward.
 
-Advancing and accessing lines of the input is done by calling the `Scanner.Line()`
-method, which returns the next line (previous in the source) as a `string`.
+Advancing and accessing lines of the input is done by calling `Scanner.Line()`,
+which returns the next line (previous in the source) as a `string`.
 
-For maximum efficiency, there is a `Scanner.LineBytes()` method. This method
-returns the next line as a byte slice, which shares its backing array with the
-internal buffer of the `Scanner`. This is for efficiency so no copy is made from
-the line data, but this also means you can only inspect or search in the slice
-before calling `Line()` or `LineBytes()` again, as the content of the internal
-buffer–and thus slices returned by `LineBytes()`–may be overwritten. If you need
-to retain the line data, make a copy of it or use the `Line()` method.
+For maximum efficiency there is `Scanner.LineBytes()`. It returns the next line
+as a byte slice, which shares its backing array with the internal buffer of
+`Scanner`. This is because no copy is made from the line data; but this also
+means you can only inspect or search in the slice before calling `Line()` or
+`LineBytes()` again, as the content of the internal buffer–and thus slices
+returned by `LineBytes()`–may be overwritten. If you need to retain the line
+data, make a copy of it or use `Line()`.
 
 
 Example using it:
