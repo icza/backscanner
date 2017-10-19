@@ -62,7 +62,7 @@ Using it to efficiently scan a file, finding last occurrence of a string ("error
 			break
 		}
 		if bytes.Contains(line, what) {
-			fmt.Printf("Found %q at line position: %2d, line: %q\n", what, pos, line)
+			fmt.Printf("Found %q at line position: %d, line: %q\n", what, pos, line)
 			break
 		}
 	}
