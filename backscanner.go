@@ -37,7 +37,7 @@ Output:
 	Line position:  0, line: "Line1"
 	Error: EOF
 
-Using it to scan a file backward, starting from its end:
+Using it to efficiently scan a file, finding last occurrence of a string ("error"):
 
 	f, err := os.Open("mylog.txt")
 	if err != nil {
@@ -50,7 +50,22 @@ Using it to scan a file backward, starting from its end:
 	defer f.Close()
 
 	scanner := backscanner.New(f, int(fi.Size()))
-	// Now use scanner like in the previous example
+	what := []byte("error")
+	for {
+		line, pos, err := scanner.LineBytes()
+		if err != nil {
+			if err == io.EOF {
+				fmt.Printf("%q is not found in file.\n", what)
+			} else {
+				fmt.Println("Error:", err)
+			}
+			break
+		}
+		if bytes.Contains(line, what) {
+			fmt.Printf("Found %q at line position: %2d, line: %q\n", what, pos, line)
+			break
+		}
+	}
 
 */
 package backscanner
