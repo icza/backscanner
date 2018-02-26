@@ -12,6 +12,11 @@ Package `backscanner` provides a scanner similar to `bufio.Scanner`, but it read
 and returns lines in reverse order, starting at a given position (which may be
 the end of the input) and going backward.
 
+This library only uses the standard library, but the test uses an external package.
+To install this library (along with the test dependency), simply run:
+
+    go get -t github.com/icza/backscanner
+
 Advancing and accessing lines of the input is done by calling `Scanner.Line()`,
 which returns the next line (previous in the source) as a `string`.
 
