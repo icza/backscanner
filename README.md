@@ -17,6 +17,8 @@ To install this library (along with the test dependency), simply run:
 
     go get -t github.com/icza/backscanner
 
+[Refer to godoc here](https://godoc.org/github.com/icza/backscanner).
+
 Advancing and accessing lines of the input is done by calling `Scanner.Line()`,
 which returns the next line (previous in the source) as a `string`.
 
