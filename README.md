@@ -1,10 +1,10 @@
 # backscanner
 
-[![Build Status](https://travis-ci.org/icza/backscanner.svg?branch=master)](https://travis-ci.org/icza/backscanner)
-[![GoDoc](https://godoc.org/github.com/icza/backscanner?status.svg)](https://godoc.org/github.com/icza/backscanner)
-[![Go Report Card](https://goreportcard.com/badge/github.com/icza/backscanner)](https://goreportcard.com/report/github.com/icza/backscanner)
-[![codecov](https://codecov.io/gh/icza/backscanner/branch/master/graph/badge.svg)](https://codecov.io/gh/icza/backscanner)
+## Credits
+This is a direct fork of https://github.com/icza/backscanner that I've ported over
+in case the upstream goes away. 
 
+## Overview
 Ever needed or wondered how to efficiently search for something in a log file,
 but starting at the end and going backward? Here's your solution.
 
@@ -15,7 +15,7 @@ the end of the input) and going backward.
 This library only uses the standard library, but the test uses an external package.
 To install this library (along with the test dependency), simply run:
 
-    go get -t github.com/icza/backscanner
+    go get -t github.com/kgoins/backscanner
 
 Advancing and accessing lines of the input is done by calling `Scanner.Line()`,
 which returns the next line (previous in the source) as a `string`.
