@@ -1,7 +1,7 @@
 # backscanner
 
-[![Build Status](https://travis-ci.org/icza/backscanner.svg?branch=master)](https://travis-ci.org/icza/backscanner)
-[![GoDoc](https://godoc.org/github.com/icza/backscanner?status.svg)](https://godoc.org/github.com/icza/backscanner)
+![Build Status](https://github.com/icza/backscanner/actions/workflows/go.yml/badge.svg)
+[![Go Reference](https://pkg.go.dev/badge/github.com/icza/backscanner.svg)](https://pkg.go.dev/github.com/icza/backscanner)
 [![Go Report Card](https://goreportcard.com/badge/github.com/icza/backscanner)](https://goreportcard.com/report/github.com/icza/backscanner)
 [![codecov](https://codecov.io/gh/icza/backscanner/branch/master/graph/badge.svg)](https://codecov.io/gh/icza/backscanner)
 
