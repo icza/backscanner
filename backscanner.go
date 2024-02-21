@@ -158,9 +158,9 @@ func (s *Scanner) readMore() {
 	// ReadAt attempts to read full buff!
 	var n int
 	n, s.err = s.r.ReadAt(s.buf2, int64(s.pos))
-	// io.ReadAt allows returning either nil or io.EOF if buf is read full and EOF reached.
+	// io.ReadAt() allows returning either nil or io.EOF if buf is read fully and EOF reached:
 	if s.err == io.EOF && n == size {
-		// Do not treat that EOF as an error, process read daa:
+		// Do not treat that EOF as an error, process read data:
 		s.err = nil
 	}
 	if s.err == nil {
