@@ -93,3 +93,29 @@ func TestLongLine(t *testing.T) {
 	_, _, err := scanner.Line()
 	eq(ErrLongLine, err)
 }
+
+type fullBufferAndEOFReaderAt struct {
+	content string
+}
+
+func (r fullBufferAndEOFReaderAt) ReadAt(p []byte, off int64) (n int, err error) {
+	if len(p) == len(r.content) && off == 0 {
+		copy(p, r.content)
+		return len(p), io.EOF
+	}
+	return strings.NewReader(r.content).ReadAt(p, off)
+}
+
+func TestFullBufferAndEOF(t *testing.T) {
+	eq := mighty.Eq(t)
+
+	in := "1234567890"
+	scanner := NewOptions(fullBufferAndEOFReaderAt{in}, len(in), &Options{
+		MaxBufferSize: len(in),
+	})
+
+	line, pos, err := scanner.Line()
+	eq(nil, err)
+	eq(in, line)
+	eq(0, pos)
+}

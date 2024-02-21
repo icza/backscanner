@@ -16,7 +16,6 @@ LineBytes() again, as the content of the internal buffer–and thus slices
 returned by LineBytes()–may be overwritten. If you need to retain the line
 data, make a copy of it or use Line().
 
-
 Example using it:
 
 	input := "Line1\nLine2\nLine3"
@@ -66,7 +65,6 @@ Using it to efficiently scan a file, finding last occurrence of a string ("error
 			break
 		}
 	}
-
 */
 package backscanner
 
@@ -158,7 +156,13 @@ func (s *Scanner) readMore() {
 	}
 
 	// ReadAt attempts to read full buff!
-	_, s.err = s.r.ReadAt(s.buf2, int64(s.pos))
+	var n int
+	n, s.err = s.r.ReadAt(s.buf2, int64(s.pos))
+	// io.ReadAt allows returning either nil or io.EOF if buf is read full and EOF reached.
+	if s.err == io.EOF && n == size {
+		// Do not treat that EOF as an error, process read daa:
+		s.err = nil
+	}
 	if s.err == nil {
 		s.buf, s.buf2 = append(s.buf2, s.buf...), s.buf
 	}
