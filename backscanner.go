@@ -38,17 +38,17 @@ Output:
 
 Using it to efficiently scan a file, finding last occurrence of a string ("error"):
 
-	f, err := os.Open("mylog.txt")
+	file, err := os.Open("mylog.txt")
 	if err != nil {
 		panic(err)
 	}
-	fi, err := f.Stat()
+	fileStatus, err := file.Stat()
 	if err != nil {
 		panic(err)
 	}
-	defer f.Close()
+	defer file.Close()
 
-	scanner := backscanner.New(f, int(fi.Size()))
+	scanner := backscanner.New(file, int(fileStatus.Size()))
 	what := []byte("error")
 	for {
 		line, pos, err := scanner.LineBytes()
@@ -72,7 +72,6 @@ import (
 	"bytes"
 	"errors"
 	"io"
-	"os"
 )
 
 const (
@@ -107,8 +106,6 @@ type Options struct {
 	// MaxBufferSize limits the maximum size of the buffer used internally.
 	// This also limits the max line size.
 	MaxBufferSize int
-
-	File *os.File
 }
 
 // New returns a new Scanner.
@@ -131,12 +128,7 @@ func NewOptions(r io.ReaderAt, pos int, o *Options) *Scanner {
 	} else {
 		s.o.MaxBufferSize = DefaultMaxBufferSize
 	}
-	if o != nil && o.File != nil {
-		s.o.File = o.File
-	} else {
-		s.o.File = nil
-	}
-
+	
 	return s
 }
 
@@ -230,10 +222,11 @@ func dropCR(data []byte) []byte {
 	return data
 }
 
-// Close closes the File, rendering it unusable for I/O.
+// Close attempts to close the underlying io.ReaderAt if it implements io.Closer.
+// It returns an error if the underlying reader cannot be closed.
 func (s *Scanner) Close() error {
-	if s.o.File != nil {
-		return s.o.File.Close()
+	if closer, ok := s.r.(io.Closer); ok {
+		return closer.Close()
 	}
 	return nil
 }
