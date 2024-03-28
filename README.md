@@ -51,17 +51,17 @@ Output:
 
 Using it to efficiently scan a file, finding last occurrence of a string (`"error"`):
 
-	f, err := os.Open("mylog.txt")
+	file, err := os.Open("mylog.txt")
 	if err != nil {
 		panic(err)
 	}
-	fi, err := f.Stat()
+	fileStatus, err := file.Stat()
 	if err != nil {
 		panic(err)
 	}
-	defer f.Close()
+	defer file.Close()
 
-	scanner := backscanner.New(f, int(fi.Size()))
+	scanner := backscanner.New(file, int(fileStatus.Size()))
 	what := []byte("error")
 	for {
 		line, pos, err := scanner.LineBytes()
