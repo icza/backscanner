@@ -72,6 +72,7 @@ import (
 	"bytes"
 	"errors"
 	"io"
+	"os"
 )
 
 const (
@@ -106,6 +107,8 @@ type Options struct {
 	// MaxBufferSize limits the maximum size of the buffer used internally.
 	// This also limits the max line size.
 	MaxBufferSize int
+
+	File *os.File
 }
 
 // New returns a new Scanner.
@@ -127,6 +130,11 @@ func NewOptions(r io.ReaderAt, pos int, o *Options) *Scanner {
 		s.o.MaxBufferSize = o.MaxBufferSize
 	} else {
 		s.o.MaxBufferSize = DefaultMaxBufferSize
+	}
+	if o != nil && o.File != nil {
+		s.o.File = o.File
+	} else {
+		s.o.File = nil
 	}
 
 	return s
@@ -220,4 +228,12 @@ func dropCR(data []byte) []byte {
 		return data[0 : len(data)-1]
 	}
 	return data
+}
+
+// Close closes the File, rendering it unusable for I/O.
+func (s *Scanner) Close() error {
+	if s.o.File != nil {
+		return s.o.File.Close()
+	}
+	return nil
 }
