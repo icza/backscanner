@@ -47,10 +47,12 @@ for {
 
 Output:
 
-	Line position: 12, line: "Line3"
-	Line position:  6, line: "Line2"
-	Line position:  0, line: "Line1"
-	Error: EOF
+```
+Line position: 12, line: "Line3"
+Line position:  6, line: "Line2"
+Line position:  0, line: "Line1"
+Error: EOF
+```
 
 Using it to efficiently scan a file, finding last occurrence of a string (`"error"`):
 ```go
