@@ -15,7 +15,9 @@ the end of the input) and going backward.
 This library only uses the standard library, but the test uses an external package.
 To install this library (along with the test dependency), simply run:
 
-    go get -t github.com/icza/backscanner
+```shell
+go get -t github.com/icza/backscanner
+```
 
 Advancing and accessing lines of the input is done by calling `Scanner.Line()`,
 which returns the next line (previous in the source) as a `string`.
@@ -30,51 +32,55 @@ data, make a copy of it or use `Line()`.
 
 
 Example using it:
-
-	input := "Line1\nLine2\nLine3"
-	scanner := backscanner.New(strings.NewReader(input), len(input))
-	for {
-		line, pos, err := scanner.Line()
-		if err != nil {
-			fmt.Println("Error:", err)
-			break
-		}
-		fmt.Printf("Line position: %2d, line: %q\n", pos, line)
+```go
+input := "Line1\nLine2\nLine3"
+scanner := backscanner.New(strings.NewReader(input), len(input))
+for {
+	line, pos, err := scanner.Line()
+	if err != nil {
+		fmt.Println("Error:", err)
+		break
 	}
+	fmt.Printf("Line position: %2d, line: %q\n", pos, line)
+}
+```
 
 Output:
 
-	Line position: 12, line: "Line3"
-	Line position:  6, line: "Line2"
-	Line position:  0, line: "Line1"
-	Error: EOF
+```
+Line position: 12, line: "Line3"
+Line position:  6, line: "Line2"
+Line position:  0, line: "Line1"
+Error: EOF
+```
 
 Using it to efficiently scan a file, finding last occurrence of a string (`"error"`):
+```go
+file, err := os.Open("mylog.txt")
+if err != nil {
+	panic(err)
+}
+fileStatus, err := file.Stat()
+if err != nil {
+	panic(err)
+}
+defer file.Close()
 
-	file, err := os.Open("mylog.txt")
+scanner := backscanner.New(file, int(fileStatus.Size()))
+what := []byte("error")
+for {
+	line, pos, err := scanner.LineBytes()
 	if err != nil {
-		panic(err)
-	}
-	fileStatus, err := file.Stat()
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
-
-	scanner := backscanner.New(file, int(fileStatus.Size()))
-	what := []byte("error")
-	for {
-		line, pos, err := scanner.LineBytes()
-		if err != nil {
-			if err == io.EOF {
-				fmt.Printf("%q is not found in file.\n", what)
-			} else {
-				fmt.Println("Error:", err)
-			}
-			break
+		if err == io.EOF {
+			fmt.Printf("%q is not found in file.\n", what)
+		} else {
+			fmt.Println("Error:", err)
 		}
-		if bytes.Contains(line, what) {
-			fmt.Printf("Found %q at line position: %d, line: %q\n", what, pos, line)
-			break
-		}
+		break
 	}
+	if bytes.Contains(line, what) {
+		fmt.Printf("Found %q at line position: %d, line: %q\n", what, pos, line)
+		break
+	}
+}
+```
