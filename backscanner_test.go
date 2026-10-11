@@ -38,6 +38,10 @@ func TestScanner(t *testing.T) {
 	}{
 		// Empty input
 		{input: "", exps: []result{{"", 0, io.EOF}}},
+		// Leading empty lines must be returned too.
+		{input: "\n", exps: []result{{"", 1, nil}, {"", 0, nil}, {"", 0, io.EOF}}},
+		{input: "\nline", exps: []result{{"line", 1, nil}, {"", 0, nil}, {"", 0, io.EOF}}},
+		{input: "\n\n", exps: []result{{"", 2, nil}, {"", 1, nil}, {"", 0, nil}, {"", 0, io.EOF}}},
 		// Normal input with \n line endings
 		{
 			input: "Start\nLine1\nLine2\nLine3\nEnd",
