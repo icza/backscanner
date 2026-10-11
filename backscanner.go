@@ -194,7 +194,7 @@ func (s *Scanner) LineBytes() (line []byte, pos int, err error) {
 		s.readMore()
 		if s.err != nil {
 			if s.err == io.EOF {
-				if len(s.buf) > 0 {
+				if s.buf != nil {
 					return dropCR(s.buf), 0, nil
 				}
 			}
