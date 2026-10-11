@@ -142,13 +142,16 @@ func (s *Scanner) readMore() {
 	if size > s.pos {
 		size = s.pos
 	}
-	s.pos -= size
-
-	bufSize := size + len(s.buf)
-	if bufSize > s.o.MaxBufferSize {
+	if remaining := s.o.MaxBufferSize - len(s.buf); size > remaining {
+		size = remaining
+	}
+	if size == 0 {
 		s.err = ErrLongLine
 		return
 	}
+	s.pos -= size
+
+	bufSize := size + len(s.buf)
 	if cap(s.buf2) >= bufSize {
 		s.buf2 = s.buf2[:size]
 	} else {
