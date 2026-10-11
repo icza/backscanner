@@ -86,7 +86,7 @@ func TestScanner(t *testing.T) {
 func TestLongLine(t *testing.T) {
 	eq := mighty.Eq(t)
 
-	scanner := NewOptions(strings.NewReader("123456789"), 10, &Options{
+	scanner := NewOptions(strings.NewReader("123456789"), 9, &Options{
 		MaxBufferSize: 5,
 	})
 
@@ -118,4 +118,26 @@ func TestFullBufferAndEOF(t *testing.T) {
 	eq(nil, err)
 	eq(in, line)
 	eq(0, pos)
+}
+
+func TestSmallBufferReadsShortLines(t *testing.T) {
+	input := strings.Repeat("a\nb\n", 8) + "end"
+	for _, chunkSize := range []int{0, 4, 5, 100} {
+		scanner := NewOptions(strings.NewReader(input), len(input), &Options{
+			ChunkSize: chunkSize, MaxBufferSize: 5,
+		})
+		parts := strings.Split(input, "\n")
+		pos := len(input)
+		for i := len(parts) - 1; i >= 0; i-- {
+			pos -= len(parts[i])
+			line, gotPos, err := scanner.Line()
+			if err != nil || line != parts[i] || gotPos != pos {
+				t.Fatalf("chunk=%d line=%d: got (%q, %d, %v), want (%q, %d, nil)", chunkSize, i, line, gotPos, err, parts[i], pos)
+			}
+			pos--
+		}
+		if _, _, err := scanner.Line(); err != io.EOF {
+			t.Fatalf("chunk=%d: want EOF, got %v", chunkSize, err)
+		}
+	}
 }
